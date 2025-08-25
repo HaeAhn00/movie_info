@@ -91,9 +91,11 @@ class HomePage extends StatelessWidget {
       bool showRank = false}) {
     return GestureDetector(
       onTap: () {
+        // 상세 페이지로 이동할 때 임시로 이미지 URL을 전달합니다.
+        final backdropUrl = 'https://picsum.photos/seed/$seed$index/600/400';
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const DetailPage(),
+            builder: (context) => DetailPage(backdropUrl: backdropUrl),
           ),
         );
       },
