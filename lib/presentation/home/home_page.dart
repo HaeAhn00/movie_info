@@ -23,8 +23,17 @@ class HomePage extends StatelessWidget {
     final viewModel = context.watch<HomeViewModel>();
     final popularMovies = viewModel.popularMovies;
 
-    if (viewModel.isLoading || popularMovies.isEmpty) {
+    if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (viewModel.errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(viewModel.errorMessage!, textAlign: TextAlign.center),
+        ),
+      );
     }
 
     return ListView(
@@ -74,14 +83,12 @@ class HomePage extends StatelessWidget {
         tag: heroTag,
         child: Container(
           height: 250,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
+            color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(15),
-            image: DecorationImage(
-              image: NetworkImage(
-                  'https://image.tmdb.org/t/p/w780${movie.posterPath}'),
-              fit: BoxFit.cover,
-            ),
           ),
+          child: _buildImage(path: movie.posterPath, size: 'w780'),
         ),
       ),
     );
@@ -141,12 +148,11 @@ class HomePage extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  'https://image.tmdb.org/t/p/w342${movie.posterPath}',
-                  width: 120,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
+                child: _buildImage(
+                    path: movie.posterPath,
+                    size: 'w342',
+                    width: 120,
+                    height: 180),
               ),
               if (showRank)
                 Positioned(
@@ -186,6 +192,33 @@ class HomePage extends StatelessWidget {
           child: DetailPage(heroTag: heroTag),
         ),
       ),
+    );
+  }
+
+  Widget _buildImage(
+      {required String path,
+      required String size,
+      double? width,
+      double? height}) {
+    if (path.isEmpty) {
+      return Container(
+        width: width,
+        height: height,
+        color: Colors.grey.shade800,
+        child: const Center(child: Icon(Icons.movie, color: Colors.white24)),
+      );
+    }
+    return Image.network(
+      'https://image.tmdb.org/t/p/$size$path',
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) =>
+          loadingProgress == null
+              ? child
+              : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      errorBuilder: (context, error, stackTrace) =>
+          const Center(child: Icon(Icons.error)),
     );
   }
 }

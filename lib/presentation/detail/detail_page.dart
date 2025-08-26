@@ -17,10 +17,19 @@ class DetailPage extends StatelessWidget {
     final viewModel = context.watch<DetailViewModel>();
     final movie = viewModel.movieDetail;
 
-    if (viewModel.isLoading || movie == null) {
+    if (viewModel.isLoading) {
       return Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (viewModel.errorMessage != null || movie == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Text(viewModel.errorMessage ?? '영화 정보를 불러올 수 없습니다.'),
+        ),
       );
     }
 
@@ -120,7 +129,7 @@ class DetailPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // 평점, 투표수 등 가로 리스트
-                  _buildStatsSection(movie),
+                  _StatsSection(movie: movie),
                   const SizedBox(height: 24),
 
                   // 제작사
@@ -129,7 +138,8 @@ class DetailPage extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  _buildProductionCompaniesSection(movie.productionCompanies),
+                  _ProductionCompaniesSection(
+                      companies: movie.productionCompanies),
                 ],
               ),
             ),
@@ -138,9 +148,15 @@ class DetailPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  // 평점, 예산 등 통계 정보를 보여주는 가로 리스트 위젯
-  Widget _buildStatsSection(MovieDetail movie) {
+class _StatsSection extends StatelessWidget {
+  final MovieDetail movie;
+
+  const _StatsSection({required this.movie});
+
+  @override
+  Widget build(BuildContext context) {
     final numberFormat = NumberFormat.decimalPattern('en_US');
     final currencyFormat =
         NumberFormat.compactSimpleCurrency(locale: 'en_US', decimalDigits: 1);
@@ -188,15 +204,22 @@ class DetailPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  // 제작사 로고를 보여주는 가로 리스트 위젯
-  Widget _buildProductionCompaniesSection(List<ProductionCompany> companies) {
+class _ProductionCompaniesSection extends StatelessWidget {
+  final List<ProductionCompany> companies;
+
+  const _ProductionCompaniesSection({required this.companies});
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: companies.length,
         itemBuilder: (context, index) {
+          final company = companies[index];
           return Container(
             width: 150,
             margin: const EdgeInsets.only(right: 12),
@@ -205,22 +228,22 @@ class DetailPage extends StatelessWidget {
               color: Colors.white.withOpacity(0.9), // 배경 흰색, 투명도 0.9
               borderRadius: BorderRadius.circular(10),
             ),
-            child: companies[index].logoPath.isEmpty
+            child: company.logoPath.isEmpty
                 ? Center(
                     child: Text(
-                    companies[index].name,
+                    company.name,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         color: Colors.black87, fontWeight: FontWeight.bold),
                   ))
                 : Image.network(
-                    'https://image.tmdb.org/t/p/w200${companies[index].logoPath}',
+                    'https://image.tmdb.org/t/p/w200${company.logoPath}',
                     fit: BoxFit.contain,
                     // 로고가 흰색일 수 있으므로 에러 시 아이콘 색상을 지정
                     errorBuilder: (context, error, stackTrace) {
                       return Center(
                         child: Text(
-                          companies[index].name,
+                          company.name,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               color: Colors.black87,

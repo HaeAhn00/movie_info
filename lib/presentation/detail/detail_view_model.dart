@@ -19,13 +19,21 @@ class DetailViewModel with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
   Future<void> fetchDetail() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    _movieDetail = await _getMovieDetailUseCase.execute(movieId);
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _movieDetail = await _getMovieDetailUseCase.execute(movieId);
+    } catch (e) {
+      _errorMessage = '상세 정보를 불러오는 데 실패했습니다: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

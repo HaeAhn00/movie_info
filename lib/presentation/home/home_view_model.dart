@@ -25,17 +25,25 @@ class HomeViewModel with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
   Future<void> fetchData() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    final homeData = await _getHomeDataUseCase.execute();
-
-    _nowPlayingMovies = homeData.nowPlaying;
-    _popularMovies = homeData.popular;
-    _topRatedMovies = homeData.topRated;
-    _upcomingMovies = homeData.upcoming;
-    _isLoading = false;
-    notifyListeners();
+    try {
+      final homeData = await _getHomeDataUseCase.execute();
+      _nowPlayingMovies = homeData.nowPlaying;
+      _popularMovies = homeData.popular;
+      _topRatedMovies = homeData.topRated;
+      _upcomingMovies = homeData.upcoming;
+    } catch (e) {
+      _errorMessage = '데이터를 불러오는 데 실패했습니다: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }
