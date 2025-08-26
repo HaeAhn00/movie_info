@@ -95,67 +95,71 @@ class HomePage extends StatelessWidget {
         final backdropUrl = 'https://picsum.photos/seed/$seed$index/600/400';
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => DetailPage(backdropUrl: backdropUrl),
+            builder: (context) =>
+                DetailPage(backdropUrl: backdropUrl, heroTag: '$seed$index'),
           ),
         );
       },
       child: Padding(
         padding: const EdgeInsets.only(right: 15.0),
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                // URL에 한글이 들어가지 않도록 영문 seed를 사용
-                'https://picsum.photos/seed/$seed$index/120/180',
-                width: 120,
-                height: 180,
-                fit: BoxFit.cover,
-                // 이미지 로딩 중 보여줄 위젯
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null)
-                    return child; // 로딩 완료 시 실제 이미지 표시
-                  return Container(
-                    width: 120,
-                    height: 180,
-                    color: Colors.grey.shade900,
-                    child: Center(
-                        child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.grey.shade700,
-                    )),
-                  );
-                },
-                // 이미지 로딩 실패 시 보여줄 위젯
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
+        child: Hero(
+          tag: '$seed$index',
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  // URL에 한글이 들어가지 않도록 영문 seed를 사용
+                  'https://picsum.photos/seed/$seed$index/120/180',
+                  width: 120,
+                  height: 180,
+                  fit: BoxFit.cover,
+                  // 이미지 로딩 중 보여줄 위젯
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null)
+                      return child; // 로딩 완료 시 실제 이미지 표시
+                    return Container(
                       width: 120,
                       height: 180,
                       color: Colors.grey.shade900,
-                      child: const Icon(Icons.error_outline));
-                },
-              ),
-            ),
-            if (showRank)
-              Positioned(
-                left: 8,
-                bottom: -10,
-                child: Text(
-                  '${index + 1}',
-                  style: TextStyle(
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                          color: Colors.black.withOpacity(0.8),
-                          blurRadius: 5,
-                          offset: const Offset(0, 0))
-                    ],
-                  ),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.grey.shade700,
+                      )),
+                    );
+                  },
+                  // 이미지 로딩 실패 시 보여줄 위젯
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                        width: 120,
+                        height: 180,
+                        color: Colors.grey.shade900,
+                        child: const Icon(Icons.error_outline));
+                  },
                 ),
               ),
-          ],
+              if (showRank)
+                Positioned(
+                  left: 8,
+                  bottom: -10,
+                  child: Text(
+                    '${index + 1}',
+                    style: TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                            color: Colors.black.withOpacity(0.8),
+                            blurRadius: 5,
+                            offset: const Offset(0, 0))
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

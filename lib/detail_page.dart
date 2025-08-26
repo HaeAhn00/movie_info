@@ -4,10 +4,12 @@ class DetailPage extends StatelessWidget {
   // 나중에는 영화 ID를 받아와서 상세 정보를 API로 호출해야 합니다.
   // 지금은 임시로 이미지 URL만 전달받습니다.
   final String backdropUrl;
+  final String heroTag;
 
   const DetailPage({
     super.key,
     required this.backdropUrl,
+    required this.heroTag,
   });
 
   @override
@@ -21,17 +23,20 @@ class DetailPage extends StatelessWidget {
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                backdropUrl,
-                fit: BoxFit.cover,
-                // 로딩 및 에러 처리
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const Center(child: Icon(Icons.error));
-                },
+              background: Hero(
+                tag: heroTag,
+                child: Image.network(
+                  backdropUrl,
+                  fit: BoxFit.cover,
+                  // 로딩 및 에러 처리
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(child: Icon(Icons.error));
+                  },
+                ),
               ),
             ),
           ),
